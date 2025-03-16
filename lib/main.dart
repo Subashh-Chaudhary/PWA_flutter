@@ -1,46 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 void main() {
-  runApp(const SmartBoardApp());
+  runApp(MyApp());
 }
 
-class SmartBoardApp extends StatelessWidget {
-  const SmartBoardApp({super.key});
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
 
-  final String pwaUrl = 'https://smart.chandannathmun.gov.np/';
+class _MyAppState extends State<MyApp> {
+  late final WebViewController _controller;
 
-  Future<void> _launchTWA(BuildContext context) async {
-    try {
-      // Use 'launch' function correctly without passing 'option'
-      await launch(
-        pwaUrl,
-        // You can directly pass the options here.
-        customTabsOption: CustomTabsOption(
-          toolbarColor: Colors.white,
-          enableUrlBarHiding: true,
-          showPageTitle: false,
-          enableInstantApps: true,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open PWA')),
-      );
-    }
+  @override
+  void initState() {
+    super.initState();
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)  // Allow dynamic content
+      ..loadRequest(Uri.parse('https://smart.chandannathmun.gov.np/'));
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: Center(
-          child: ElevatedButton(
-            onPressed: () => _launchTWA(context),
-            child: const Text('Open Smart Board PWA'),
-          ),
-        ),
+        body: WebViewWidget(controller: _controller),
       ),
     );
   }
